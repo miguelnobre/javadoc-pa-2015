@@ -1,0 +1,3 @@
+import "MethodDeclaration.stg"
+import "FieldDeclaration.stg"
+import "TypeDeclaration.stg"
