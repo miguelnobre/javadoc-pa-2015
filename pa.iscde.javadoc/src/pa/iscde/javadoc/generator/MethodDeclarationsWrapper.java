@@ -79,7 +79,7 @@ public class MethodDeclarationsWrapper {
 	}
 
 	private String getThrows(MethodDeclaration method) {
-		StringBuilder sb = new StringBuilder("(");
+		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < method.thrownExceptionTypes().size(); i++) {
 			sb.append(method.thrownExceptionTypes().get(i).toString() + (i != method.thrownExceptionTypes().size() - 1 ? ", " : ""));
