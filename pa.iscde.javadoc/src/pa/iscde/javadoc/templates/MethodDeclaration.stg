@@ -1,8 +1,12 @@
-preVisit_MethodDeclaration(MethodDeclaration, JavaDoc) ::= <<
+preVisit_MethodDeclaration(MethodDeclaration, JavaDoc, MethodWrapper) ::= <<
 \<hr>
-\<ul>\<b>Method Name:\</b>
+	<if(MethodWrapper.isConstructor)>
+		\<ul>\<b>Constructor Name:\</b>
+	<else>
+		\<ul>\<b>Method Name:\</b>
+	<endif>	
 	\<ul>
-		\<b>\<a href="#<MethodDeclaration.startPosition>-<MethodDeclaration.length>"><MethodDeclaration.name>\</a>\</b>
+		\<b>\<a href="#<MethodDeclaration.startPosition>-<MethodDeclaration.length>"><MethodWrapper.signature>\</a>\</b>
 	\</ul>
 \</ul>	
 
@@ -12,7 +16,7 @@ preVisit_MethodDeclaration(MethodDeclaration, JavaDoc) ::= <<
 		\<ul><JavaDoc.description>\</ul>
 	\</ul>	
 <endif>
-		
+
 <JavaDoc.tags:{anotTag|
 	\<ul>
 		\<b><first(JavaDoc.annotationsMapWrapper.(anotTag)).tag.headerName>\</b>
@@ -25,5 +29,5 @@ preVisit_MethodDeclaration(MethodDeclaration, JavaDoc) ::= <<
 }; separator="\n">
 >>
 
-postVisit_MethodDeclaration(MethodDeclaration, JavaDoc) ::= <<
+postVisit_MethodDeclaration(MethodDeclaration, JavaDoc, MethodWrapper) ::= <<
 >>

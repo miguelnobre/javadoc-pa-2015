@@ -35,16 +35,22 @@ public class StringTemplateVisitor extends ASTVisitor {
 
 			if (bd.getJavadoc() != null) {
 				javaDoc = javaDocParser.parseJavaDoc(bd.getJavadoc().toString());
-			}
-			
-			if(node instanceof MethodDeclaration){
-				System.out.println();
-			}
 
-			template.add(node.getClass().getSimpleName(), node);
-			template.add("JavaDoc", javaDoc);
+				if (node instanceof MethodDeclaration) {
+					
+					MethodDeclaration method = (MethodDeclaration) node;
+					MethodDeclarationsWrapper methodWrapper = new MethodDeclarationsWrapper(method);
+					
+					System.out.println(methodWrapper.getSignature());
 
-			stringBuilder.append(template.render());
+					template.add("MethodWrapper", methodWrapper);
+				}
+
+				template.add(node.getClass().getSimpleName(), node);
+				template.add("JavaDoc", javaDoc);
+
+				stringBuilder.append(template.render());
+			}
 		}
 
 	}
