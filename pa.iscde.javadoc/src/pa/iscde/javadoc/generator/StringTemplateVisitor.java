@@ -41,7 +41,7 @@ public class StringTemplateVisitor extends ASTVisitor {
 					MethodDeclaration method = (MethodDeclaration) node;
 					MethodDeclarationsWrapper methodWrapper = new MethodDeclarationsWrapper(method);
 					
-					System.out.println(methodWrapper.getSignature());
+//					System.out.println(methodWrapper.getSignature());
 
 					template.add("MethodWrapper", methodWrapper);
 				}

@@ -19,8 +19,8 @@ This extension allows you to creaate a new JavaDoc tags, so that they can be ext
          </appinfo>
       </annotation>
       <complexType>
-         <sequence>
-            <element ref="item"/>
+         <sequence minOccurs="1" maxOccurs="unbounded">
+            <element ref="tag"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -49,15 +49,25 @@ This extension allows you to creaate a new JavaDoc tags, so that they can be ext
       </complexType>
    </element>
 
-   <element name="item">
+   <element name="tag">
       <complexType>
-         <attribute name="class" type="string">
+         <attribute name="namedTag" type="string">
             <annotation>
                <documentation>
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":pt.iscde.javadoc.annotation.mfane.JavaDocAnnotationsExtension"/>
+                  <meta.attribute kind="java" basedOn=":pt.iscde.javadoc.annotations.mfane.JavaDocNamedAnnotationsExtension"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="unnamedTag" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":pt.iscde.javadoc.annotations.mfane.JavaDocUnnamedAnnotationsExtension"/>
                </appinfo>
             </annotation>
          </attribute>

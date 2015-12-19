@@ -31,7 +31,8 @@ import pa.iscde.javadoc.parser.tag.SerialTag;
 import pa.iscde.javadoc.parser.tag.SinceTag;
 import pa.iscde.javadoc.parser.tag.ThrowsTag;
 import pa.iscde.javadoc.parser.tag.VersionTag;
-import pt.iscde.javadoc.annotations.mfane.JavaDocAnnotationsExtension;
+import pt.iscde.javadoc.annotations.mfane.JavaDocNamedAnnotationsExtension;
+import pt.iscde.javadoc.annotations.mfane.JavaDocUnnamedAnnotationsExtension;
 
 public class JavaDocParser {
 
@@ -164,9 +165,23 @@ public class JavaDocParser {
 			IConfigurationElement[] confElements = e.getConfigurationElements();
 			for (IConfigurationElement c : confElements) {
 				try {
-					JavaDocAnnotationsExtension o = (JavaDocAnnotationsExtension) c.createExecutableExtension("class");
-					addTags(o.getNamedTags());
-					addTags(o.getUnnamedTags());
+					if (c.getAttribute("namedTag") != null) {
+						try {
+							JavaDocNamedAnnotationsExtension o = (JavaDocNamedAnnotationsExtension) c.createExecutableExtension("namedTag");
+							addTag(o.getTag());
+						} catch (ClassCastException ex) {
+							JavaDocServiceLocator.getLogService().log(LogService.LOG_ERROR, ex.getMessage());
+						}
+					}
+					
+					if (c.getAttribute("unnamedTag") != null) {
+						try {
+							JavaDocUnnamedAnnotationsExtension o = (JavaDocUnnamedAnnotationsExtension) c.createExecutableExtension("unnamedTag");
+							addTag(o.getTag());
+						} catch (ClassCastException ex) {
+							JavaDocServiceLocator.getLogService().log(LogService.LOG_ERROR, ex.getMessage());
+						}
+					}
 				} catch (CoreException e1) {
 					e1.printStackTrace();
 				}

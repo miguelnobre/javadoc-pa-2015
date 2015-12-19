@@ -66,7 +66,6 @@ public class MethodDeclarationsWrapper {
 		for (int i = 0; i < method.parameters().size(); i++) {
 			sb.append(method.parameters().get(i) + (i != method.parameters().size() - 1 ? ", " : ""));
 		}
-		System.out.println(sb.toString());
 		return sb.append(")").toString();
 	}
 

@@ -1,8 +1,8 @@
 package pa.iscde.javadoc.parser.tag;
 
-import pa.iscde.javadoc.parser.export.JavaDocUnnamedTagI;
+import pa.iscde.javadoc.parser.export.JavaDocNamedTagI;
 
-public class ThrowsTag implements JavaDocUnnamedTagI {
+public class ThrowsTag implements JavaDocNamedTagI {
 
 	@Override
 	public String getHeaderName() {
