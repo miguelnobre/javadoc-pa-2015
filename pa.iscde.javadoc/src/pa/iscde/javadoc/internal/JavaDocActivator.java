@@ -22,7 +22,6 @@ public class JavaDocActivator implements BundleActivator {
 		JavaDocServicesImplementation jDocServiceImpl = new JavaDocServicesImplementation();
 		this.service = context.registerService(JavaDocServices.class, jDocServiceImpl, null);
 		JavaDocServiceLocator.setService(JavaDocServices.class, jDocServiceImpl);
-
 	}
 
 	@Override
@@ -37,5 +36,6 @@ public class JavaDocActivator implements BundleActivator {
 	public static JavaDocActivator getInstance() {
 		return instance;
 	}
+
 
 }

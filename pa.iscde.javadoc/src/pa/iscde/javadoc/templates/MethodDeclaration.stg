@@ -4,9 +4,48 @@ preVisit_MethodDeclaration(MethodDeclaration, JavaDoc, MethodWrapper) ::= <<
 		\<ul>\<b>Constructor Name:\</b>
 	<else>
 		\<ul>\<b>Method Name:\</b>
-	<endif>	
+	<endif>
+		
 	\<ul>
-		\<b>\<a href="#<MethodDeclaration.startPosition>-<MethodDeclaration.length>"><MethodWrapper.signature>\</a>\</b>
+		<MethodWrapper.modifier>
+		
+		<if(!MethodWrapper.constructor)>
+		
+			<if(MethodWrapper.returnMap.file)>
+				\<b>\<a href="#<MethodWrapper.returnMap.file>"><MethodWrapper.returnMap.type>\</a>\</b>
+			<else>
+				<MethodWrapper.returnType>
+			<endif>
+		<endif>
+		
+		\<b>\<a href="#<MethodDeclaration.startPosition>-<MethodDeclaration.length>"><MethodWrapper.name>\</a>\</b>
+
+		(
+		<MethodWrapper.variableType:{v|
+			<if(v.file)>
+				\<b>\<a href="#<v.file>"><v.type>\</a>\</b>
+			<else>
+				<v.type>
+			<endif>
+			
+			<v.name>
+		}; separator=", ">
+		)
+		
+		<if(MethodWrapper.throwsMap)>
+			throws
+			
+			<MethodWrapper.throwsMap:{e|
+			
+			<if(e.file)>
+				\<b>\<a href="#<e.file>"><e.type>\</a>\</b>
+			<else>
+				<e.type>
+			<endif>
+			
+			}; separator=", ">
+			
+		<endif>
 	\</ul>
 \</ul>	
 
