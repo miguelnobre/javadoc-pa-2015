@@ -28,7 +28,7 @@ public class JavaDocView implements PidescoView {
 
 	private File lastParsedFile;
 
-	public static Stack<String> stackNext = new Stack();
+	public static Stack<String> stackNext = new Stack<String>();
 	public static Stack<String> stackPrevious = new Stack<String>();
 
 	public static JavaDocView getInstance() {
@@ -88,7 +88,7 @@ public class JavaDocView implements PidescoView {
 				} else if (event.location.contains("#back")) {
 					if (stackPrevious.size() > 1) {
 						stackNext.push(stackPrevious.pop());
-						;//Remove da stack a classe actual, para no proximo pop obtermos a classse anteriormente aberta
+						//Remove da stack a classe actual, para no proximo pop obtermos a classse anteriormente aberta
 						File file = new File(stackPrevious.pop());
 						JavaDocServiceLocator.getJavaEditorService().openFile(file);
 					}

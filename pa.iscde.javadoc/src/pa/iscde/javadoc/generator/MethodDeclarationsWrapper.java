@@ -22,7 +22,7 @@ public class MethodDeclarationsWrapper {
 	private List<ObjectMap> throwsMap = new ArrayList<ObjectMap>();
 	
 	public MethodDeclarationsWrapper(MethodDeclaration method, Map<String, File> workSpaceFiles) {
-		this.modifier = getModifier(method);
+		this.modifier = getModifier(method);       
 		this.returnType = getReturn(method, workSpaceFiles);
 		this.name = getName(method);
 		this.params = getParams(method, workSpaceFiles);
@@ -101,11 +101,10 @@ public class MethodDeclarationsWrapper {
 			ObjectMap p = new ObjectMap(variable.getType().toString(), variable.getName().toString(), path);
 			this.variableType.add(p);
 			// }
-
 		}
 		return sb.append(")").toString();
 	}
-
+	
 	private String getReturn(MethodDeclaration method, Map<String, File> workSpaceFiles) {
 
 		if (method.getReturnType2() != null) {

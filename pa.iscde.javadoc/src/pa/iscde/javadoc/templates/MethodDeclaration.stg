@@ -18,7 +18,7 @@ preVisit_MethodDeclaration(MethodDeclaration, JavaDoc, MethodWrapper) ::= <<
 			<endif>
 		<endif>
 		
-		\<b>\<a href="#<MethodDeclaration.startPosition>-<MethodDeclaration.length>"><MethodWrapper.name>\</a>\</b>
+		\<a href="#<MethodDeclaration.startPosition>-<MethodDeclaration.length>"><MethodWrapper.name>\</a>
 
 		(
 		<MethodWrapper.variableType:{v|
