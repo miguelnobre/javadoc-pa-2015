@@ -8,34 +8,33 @@ import pa.iscde.javadoc.service.JavaDocServices;
 
 public class JavaDocActivator implements BundleActivator {
 
-	public static JavaDocActivator instance;
+    public static JavaDocActivator instance;
 
-	private ServiceRegistration<JavaDocServices> service;
+    private ServiceRegistration<JavaDocServices> service;
 
-	@Override
-	public void start(final BundleContext context) throws Exception {
+    @Override
+    public void start(final BundleContext context) throws Exception {
 
-		instance = this;
+	instance = this;
 
-		JavaDocServiceLocator.initialize(context);
+	JavaDocServiceLocator.initialize(context);
 
-		JavaDocServicesImplementation jDocServiceImpl = new JavaDocServicesImplementation();
-		this.service = context.registerService(JavaDocServices.class, jDocServiceImpl, null);
-		JavaDocServiceLocator.setService(JavaDocServices.class, jDocServiceImpl);
-	}
+	JavaDocServicesImplementation jDocServiceImpl = new JavaDocServicesImplementation();
+	this.service = context.registerService(JavaDocServices.class, jDocServiceImpl, null);
+	JavaDocServiceLocator.setService(JavaDocServices.class, jDocServiceImpl);
+    }
 
-	@Override
-	public void stop(final BundleContext context) throws Exception {
+    @Override
+    public void stop(final BundleContext context) throws Exception {
 
-		instance = null;
+	instance = null;
 
-		this.service.unregister();
-		JavaDocServiceLocator.deinitialize();
-	}
+	this.service.unregister();
+	JavaDocServiceLocator.deinitialize();
+    }
 
-	public static JavaDocActivator getInstance() {
-		return instance;
-	}
-
+    public static JavaDocActivator getInstance() {
+	return instance;
+    }
 
 }

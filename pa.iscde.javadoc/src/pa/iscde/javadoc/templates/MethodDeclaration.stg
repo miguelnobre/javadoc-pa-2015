@@ -16,33 +16,33 @@ preVisit_MethodDeclaration(MethodDeclaration, JavaDoc, MethodWrapper) ::= <<
 			<else>
 				<MethodWrapper.returnType>
 			<endif>
+			
 		<endif>
 		
 		\<a href="#<MethodDeclaration.startPosition>-<MethodDeclaration.length>"><MethodWrapper.name>\</a>
 
 		(
-		<MethodWrapper.variableType:{v|
-			<if(v.file)>
-				\<b>\<a href="#<v.file>"><v.type>\</a>\</b>
+		<MethodWrapper.variableType:{var|
+			<if(var.file)>
+				\<b>\<a href="#<var.file>"><var.type>\</a>\</b>
 			<else>
-				<v.type>
+				<var.type>
 			<endif>
 			
-			<v.name>
+			<var.name>
 		}; separator=", ">
 		)
 		
 		<if(MethodWrapper.throwsMap)>
 			throws
 			
-			<MethodWrapper.throwsMap:{e|
+			<MethodWrapper.throwsMap:{throw|
 			
-			<if(e.file)>
-				\<b>\<a href="#<e.file>"><e.type>\</a>\</b>
+			<if(throw.file)>
+				\<b>\<a href="#<throw.file>"><throw.type>\</a>\</b>
 			<else>
-				<e.type>
+				<throw.type>
 			<endif>
-			
 			}; separator=", ">
 			
 		<endif>
@@ -59,9 +59,9 @@ preVisit_MethodDeclaration(MethodDeclaration, JavaDoc, MethodWrapper) ::= <<
 <JavaDoc.tags:{anotTag|
 	\<ul>
 		\<b><first(JavaDoc.annotationsMapWrapper.(anotTag)).tag.headerName>\</b>
-			<JavaDoc.annotationsMapWrapper.(anotTag):{p|
+			<JavaDoc.annotationsMapWrapper.(anotTag):{anot|
 				\<ul>
-					<p.name> <if(p.name && p.description)>-<endif> <p.description>
+					<anot.name> <if(anot.name && anot.description)>-<endif> <anot.description>
 				\</ul>
 			}; separator="\n">
 	\</ul>

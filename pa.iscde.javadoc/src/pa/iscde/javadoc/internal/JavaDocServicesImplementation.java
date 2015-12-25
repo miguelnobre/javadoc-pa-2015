@@ -6,9 +6,9 @@ import pa.iscde.javadoc.service.JavaDocServices;
 
 public class JavaDocServicesImplementation implements JavaDocServices {
 
-	private final LogService logService;
+    private final LogService logService;
 
-	public JavaDocServicesImplementation() {
-		this.logService = JavaDocServiceLocator.getLogService();
-	}
+    public JavaDocServicesImplementation() {
+	this.logService = JavaDocServiceLocator.getLogService();
+    }
 }

@@ -19,8 +19,9 @@ This extension allows you to creaate a new JavaDoc tags, so that they can be ext
          </appinfo>
       </annotation>
       <complexType>
-         <sequence minOccurs="1" maxOccurs="unbounded">
-            <element ref="tag"/>
+         <sequence>
+            <element ref="unnamedTag" minOccurs="1" maxOccurs="unbounded"/>
+            <element ref="namedTag" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -49,9 +50,9 @@ This extension allows you to creaate a new JavaDoc tags, so that they can be ext
       </complexType>
    </element>
 
-   <element name="tag">
+   <element name="namedTag">
       <complexType>
-         <attribute name="namedTag" type="string">
+         <attribute name="class" type="string">
             <annotation>
                <documentation>
                   
@@ -61,7 +62,12 @@ This extension allows you to creaate a new JavaDoc tags, so that they can be ext
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="unnamedTag" type="string">
+      </complexType>
+   </element>
+
+   <element name="unnamedTag">
+      <complexType>
+         <attribute name="class" type="string">
             <annotation>
                <documentation>
                   
