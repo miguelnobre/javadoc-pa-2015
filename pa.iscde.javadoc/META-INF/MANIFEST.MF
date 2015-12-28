@@ -18,5 +18,6 @@ Bundle-Activator: pa.iscde.javadoc.internal.JavaDocActivator
 Bundle-ClassPath: lib/ST-4.0.8.jar,
  .,
  lib/guava-18.0.jar
-Export-Package: pa.iscde.javadoc.parser.export,
+Export-Package: pa.iscde.javadoc.export.parser,
+ pa.iscde.javadoc.export.style,
  pt.iscde.javadoc.annotations.mfane
