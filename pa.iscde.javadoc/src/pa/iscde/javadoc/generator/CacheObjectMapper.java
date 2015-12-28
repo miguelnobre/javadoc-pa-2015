@@ -15,10 +15,22 @@ public class CacheObjectMapper {
 	loadCache();
     }
 
-    private void loadCache() {
+    public static CacheObjectMapper getInstance() {
+	if (instance == null) {
+	    instance = new CacheObjectMapper();
+	}
+
+	return instance;
+    }
+
+    public void loadCache() {
 	this.workSpaceFiles = new HashMap<String, File>();
 	String workspaceRoot = JavaDocServiceLocator.getProjectBrowserService().getRootPackage().getFile().getAbsolutePath();
 	loadFiles(workspaceRoot);
+    }
+
+    public String getFilePath(String clazz) {
+	return this.workSpaceFiles.get(clazz + ".java") != null ? this.workSpaceFiles.get(clazz + ".java").getAbsolutePath() : null;
     }
 
     private void loadFiles(String directoryPath) {
@@ -36,19 +48,4 @@ public class CacheObjectMapper {
 	}
     }
 
-    public static CacheObjectMapper getInstance() {
-	if (instance == null) {
-	    instance = new CacheObjectMapper();
-	}
-
-	return instance;
-    }
-
-    public void refreshCache() {
-	loadCache();
-    }
-
-    public String getFilePath(String clazz) {
-	return this.workSpaceFiles.get(clazz + ".java") != null ? this.workSpaceFiles.get(clazz + ".java").getAbsolutePath() : null;
-    }
 }

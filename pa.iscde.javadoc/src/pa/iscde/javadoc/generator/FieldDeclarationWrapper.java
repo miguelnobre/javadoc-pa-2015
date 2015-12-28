@@ -6,6 +6,12 @@ import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
+/**
+ * Wrapper do FieldDeclaration 
+ * Tem metodos auxiliar para extrair informação necessária a apresentar no JavaDoc gerado
+ *
+ * @author Miguel
+ */
 public class FieldDeclarationWrapper {
 
     private String modifier;
@@ -28,6 +34,11 @@ public class FieldDeclarationWrapper {
 	return field.modifiers().get(0).toString();
     }
 
+    /**
+     * Extrai o Tipo do Atributo. Sabe extrair se for Simples, um Array e se estiver parameterizado numa Lista. 
+     * @param field
+     * @return
+     */
     private ObjectMap extractType(FieldDeclaration field) {
 	VariableDeclarationFragment var = (VariableDeclarationFragment) field.fragments().get(0);
 	String varType = field.getType().toString();

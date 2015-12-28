@@ -1,6 +1,6 @@
 package pa.iscde.javadoc.parser.tag;
 
-import pa.iscde.javadoc.parser.export.JavaDocNamedTagI;
+import pa.iscde.javadoc.export.parser.JavaDocNamedTagI;
 
 public class ParamTag implements JavaDocNamedTagI{
 

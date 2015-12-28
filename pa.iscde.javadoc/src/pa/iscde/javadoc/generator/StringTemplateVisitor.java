@@ -1,8 +1,5 @@
 package pa.iscde.javadoc.generator;
 
-import java.io.File;
-import java.util.Map;
-
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
@@ -20,6 +17,7 @@ public class StringTemplateVisitor extends ASTVisitor {
     private static final STGroup group;
 
     private StringBuilder stringBuilder;
+    private boolean showElementsWithoutJavaDoc;
     private JavaDocParser javaDocParser = new JavaDocParser();
 
     static {
@@ -27,8 +25,13 @@ public class StringTemplateVisitor extends ASTVisitor {
     }
 
     public StringTemplateVisitor(final StringBuilder stringBuilder) {
+	this(stringBuilder, false);
+    }
+
+    public StringTemplateVisitor(final StringBuilder stringBuilder, boolean showElementsWithoutJavaDoc) {
 	super(true);
 	this.stringBuilder = stringBuilder;
+	this.showElementsWithoutJavaDoc = showElementsWithoutJavaDoc;
     }
 
     private void renderNode(final ASTNode node, final String operation) {
@@ -42,22 +45,24 @@ public class StringTemplateVisitor extends ASTVisitor {
 		javaDoc = javaDocParser.parseJavaDoc(bd.getJavadoc().toString());
 	    }
 
-	    if (node instanceof MethodDeclaration) {
-		MethodDeclaration method = (MethodDeclaration) node;
-		MethodDeclarationsWrapper methodWrapper = new MethodDeclarationsWrapper(method);
+	    if (bd.getJavadoc() != null || showElementsWithoutJavaDoc) {
+		if (node instanceof MethodDeclaration) {
+		    MethodDeclaration method = (MethodDeclaration) node;
+		    MethodDeclarationsWrapper methodWrapper = new MethodDeclarationsWrapper(method);
 
-		template.add("MethodWrapper", methodWrapper);
-	    } else if (node instanceof FieldDeclaration) {
-		FieldDeclaration field = (FieldDeclaration) node;
-		FieldDeclarationWrapper fieldWrapper = new FieldDeclarationWrapper(field);
+		    template.add("MethodWrapper", methodWrapper);
+		} else if (node instanceof FieldDeclaration) {
+		    FieldDeclaration field = (FieldDeclaration) node;
+		    FieldDeclarationWrapper fieldWrapper = new FieldDeclarationWrapper(field);
 
-		template.add("FieldDeclarationWrapper", fieldWrapper);
+		    template.add("FieldDeclarationWrapper", fieldWrapper);
+		}
+
+		template.add(node.getClass().getSimpleName(), node);
+		template.add("JavaDoc", javaDoc);
+
+		stringBuilder.append(template.render());
 	    }
-
-	    template.add(node.getClass().getSimpleName(), node);
-	    template.add("JavaDoc", javaDoc);
-
-	    stringBuilder.append(template.render());
 	}
     }
 

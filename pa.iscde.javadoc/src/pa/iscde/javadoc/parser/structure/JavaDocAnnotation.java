@@ -1,24 +1,18 @@
 package pa.iscde.javadoc.parser.structure;
 
+/**
+ * Representa uma Tag e o seu Conteudo
+ * @author Miguel
+ *
+ */
 public class JavaDocAnnotation {
 
     private JavaDocTagI tag;
-    private String name;
     private String description;
 
     public JavaDocAnnotation(JavaDocTagI tag, String description) {
 	this.tag = tag;
 	this.description = description;
-    }
-
-    public JavaDocAnnotation(JavaDocTagI tag, String name, String description) {
-	this.tag = tag;
-	if (name != null && !name.equals("")) {
-	    this.name = name;
-	}
-	if (description != null && !description.equals("")) {
-	    this.description = description;
-	}
     }
 
     public JavaDocTagI getTag() {
@@ -27,14 +21,6 @@ public class JavaDocAnnotation {
 
     public void setTag(JavaDocTagI tag) {
 	this.tag = tag;
-    }
-
-    public String getName() {
-	return name;
-    }
-
-    public void setName(String name) {
-	this.name = name;
     }
 
     public String getDescription() {

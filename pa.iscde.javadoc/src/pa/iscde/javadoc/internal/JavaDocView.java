@@ -1,6 +1,10 @@
 package pa.iscde.javadoc.internal;
 
+import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Map;
 import java.util.Stack;
 
@@ -37,7 +41,6 @@ public class JavaDocView implements PidescoView {
 
     @Override
     public void createContents(final Composite viewArea, final Map<String, Image> imageMap) {
-
 	instance = this;
 	this.viewArea = viewArea;
 
@@ -81,6 +84,17 @@ public class JavaDocView implements PidescoView {
 		    if (!stackNext.isEmpty()) {
 			File file = new File(stackNext.pop());
 			JavaDocServiceLocator.getJavaEditorService().openFile(file);
+		    }
+		} else if (event.location.contains("http")) {
+		    try {
+			URL url = new URL(event.location);
+			Desktop.getDesktop().browse(url.toURI());
+			//Como o browser abre a pagina do link, é necessário fazer parse de novo a classe, para que o Browser volte a apresentar o JavaDoc.
+			JavaDocServiceLocator.getJavaEditorService().openFile(lastParsedFile);
+		    } catch (IOException e) {
+			e.printStackTrace();
+		    } catch (URISyntaxException e) {
+			e.printStackTrace();
 		    }
 		}
 	    }
@@ -148,5 +162,4 @@ public class JavaDocView implements PidescoView {
 	    }
 	}
     }
-
 }

@@ -6,6 +6,12 @@ import java.util.List;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 
+/**
+ * Wrapper do MethodDeclaration
+ * Tem metodos auxiliar para extrair informação necessária a apresentar no JavaDoc gerado
+ *
+ * @author Miguel
+ */
 public class MethodDeclarationsWrapper {
 
     private Boolean constructor;
@@ -48,6 +54,11 @@ public class MethodDeclarationsWrapper {
 	return this.throwsMap;
     }
 
+    /**
+     * Extrai o Modifier do Metodo. Ignora anotações como o "@Override".
+     * @param method
+     * @return
+     */
     private String getModifier(MethodDeclaration method) {
 	for (int i = 0; i < method.modifiers().size(); i++) {
 	    if (!method.modifiers().get(i).toString().startsWith("@")) { // Despreza anotações
@@ -57,10 +68,20 @@ public class MethodDeclarationsWrapper {
 	return null;
     }
 
+    /**
+     * Extrai o nome do Metodo
+     * @param method
+     * @return
+     */
     private String getName(MethodDeclaration method) {
 	return method.getName().toString();
     }
 
+    /**
+     * Extrai os Parametros do Metodo e obtem o respectivo caminho do ficheiro da classe no Workspace
+     * @param method
+     * @return
+     */
     private List<ObjectMap> getParams(MethodDeclaration method) {
 	List<ObjectMap> varList = new ArrayList<ObjectMap>();
 
@@ -74,6 +95,11 @@ public class MethodDeclarationsWrapper {
 	return varList;
     }
 
+    /**
+     * Extrai o Tipo de Return do Metodo, e obtem o respectivo caminho do ficheiro da classe no Workspace
+     * @param method
+     * @return
+     */
     private ObjectMap getReturn(MethodDeclaration method) {
 
 	if (method.getReturnType2() != null) {
@@ -83,6 +109,11 @@ public class MethodDeclarationsWrapper {
 	return null;
     }
 
+    /**
+     * Extrai as Excepções que o Metodo lança, e obtem o respectivo caminho do ficheiro da classe no Workspace
+     * @param method
+     * @return
+     */
     private List<ObjectMap> getThrows(MethodDeclaration method) {
 	List<ObjectMap> throwList = new ArrayList<ObjectMap>();
 

@@ -16,9 +16,11 @@ import org.osgi.service.log.LogService;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
+import pa.iscde.javadoc.export.parser.JavaDocCustomTag;
+import pa.iscde.javadoc.export.parser.JavaDocNamedTagI;
+import pa.iscde.javadoc.export.parser.JavaDocUnnamedTagI;
+import pa.iscde.javadoc.export.style.AnnotationStyleI;
 import pa.iscde.javadoc.internal.JavaDocServiceLocator;
-import pa.iscde.javadoc.parser.export.JavaDocNamedTagI;
-import pa.iscde.javadoc.parser.export.JavaDocUnnamedTagI;
 import pa.iscde.javadoc.parser.structure.JavaDocAnnotation;
 import pa.iscde.javadoc.parser.structure.JavaDocBlock;
 import pa.iscde.javadoc.parser.structure.JavaDocTagI;
@@ -31,6 +33,7 @@ import pa.iscde.javadoc.parser.tag.SerialTag;
 import pa.iscde.javadoc.parser.tag.SinceTag;
 import pa.iscde.javadoc.parser.tag.ThrowsTag;
 import pa.iscde.javadoc.parser.tag.VersionTag;
+import pt.iscde.javadoc.annotations.mfane.JavaDocCustomAnnotationExtension;
 import pt.iscde.javadoc.annotations.mfane.JavaDocNamedAnnotationsExtension;
 import pt.iscde.javadoc.annotations.mfane.JavaDocUnnamedAnnotationsExtension;
 
@@ -84,7 +87,6 @@ public class JavaDocParser {
     }
 
     private Multimap<String, JavaDocAnnotation> extractAnnotations(String[] javaDocDetailed) {
-	String name = null;
 	String description = null;
 	JavaDocAnnotation anot = null;
 
@@ -92,7 +94,6 @@ public class JavaDocParser {
 
 	try {
 	    for (int i = 1; i < javaDocDetailed.length; i++) {
-		name = null;
 		description = null;
 
 		String tag = javaDocDetailed[i].substring(0, javaDocDetailed[i].indexOf(' '));
@@ -103,16 +104,34 @@ public class JavaDocParser {
 
 		if (anotTag != null) {
 		    if (anotTag instanceof JavaDocNamedTagI) {
+			String[] columns = new String[2];
 
-			name = text.substring(0, text.indexOf(' ') == -1 ? text.length() : text.indexOf(' '));
+			columns[0] = text.substring(0, text.indexOf(' ') == -1 ? text.length() : text.indexOf(' '));
 			endIndex = text.indexOf(' ') + 1;
-			description = text.substring(endIndex == 0 ? text.length() : endIndex);
+			columns[1] = text.substring(endIndex == 0 ? text.length() : endIndex);
+
+			description = getFormatedDescription(columns);
 
 		    } else if (anotTag instanceof JavaDocUnnamedTagI) {
 			description = text;
+		    } else if (anotTag instanceof JavaDocCustomTag) {
+			JavaDocCustomTag customTag = (JavaDocCustomTag) anotTag;
+			String[] columns = text.split(customTag.getColumnSeparator());
+
+			// Garante que o n de colunas no JavaDoc é o que se esta a espera
+			if (columns.length != customTag.nColumns()) {
+			    throw new Exception("Numero de Colunas Inválido!");
+			}
+
+			// Para cada Estilo definido na Tag, vai ser aplicado a estilização às colunas definidas
+			for (AnnotationStyleI style : customTag.getAnnotationStyle()) {
+			    style.getStyled(columns);
+			}
+
+			description = getFormatedDescription(columns);
 		    }
 
-		    anot = new JavaDocAnnotation(anotTag, name, description);
+		    anot = new JavaDocAnnotation(anotTag, description);
 		    annotations.put(anot.getTagName(), anot);
 		}
 	    }
@@ -122,6 +141,17 @@ public class JavaDocParser {
 	return annotations;
     }
 
+    private String getFormatedDescription(String[] columns) {
+	StringBuilder sb = new StringBuilder();
+	for (int j = 0; j < columns.length; j++) {
+	    if (columns[j] != null) {
+		sb.append(columns[j]);
+		sb.append(j != columns.length - 1 && columns[j + 1] != null ? " - " : "");
+	    }
+	}
+	return sb.toString();
+    }
+
     public String printJavaDoc(JavaDocBlock javaDocBlock) {
 	StringBuilder sb = new StringBuilder();
 
@@ -129,11 +159,7 @@ public class JavaDocParser {
 
 	for (String tag : orderedTags) {
 	    for (JavaDocAnnotation anot : javaDocBlock.getAnnotations(tag)) {
-		if (anot.getName() == null || anot.getName().equals("")) {
-		    sb.append("@" + anot.getTag() + " " + anot.getDescription() + "\n");
-		} else {
-		    sb.append("@" + anot.getTag() + " " + anot.getName() + " - " + anot.getDescription() + "\n");
-		}
+		sb.append("@" + anot.getTag() + " " + anot.getDescription() + "\n");
 	    }
 	}
 	return sb.toString();
@@ -179,6 +205,9 @@ public class JavaDocParser {
 			} catch (ClassCastException ex) {
 			    JavaDocServiceLocator.getLogService().log(LogService.LOG_ERROR, ex.getMessage());
 			}
+		    } else if (c.getName().equals("customTag")) {
+			JavaDocCustomAnnotationExtension o = (JavaDocCustomAnnotationExtension) c.createExecutableExtension("class");
+			addTag(o.getJavaDocCustomTag());
 		    }
 		} catch (CoreException e1) {
 		    e1.printStackTrace();

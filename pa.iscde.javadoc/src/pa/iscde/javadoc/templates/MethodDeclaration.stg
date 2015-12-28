@@ -61,7 +61,7 @@ preVisit_MethodDeclaration(MethodDeclaration, JavaDoc, MethodWrapper) ::= <<
 		\<b><first(JavaDoc.annotationsMapWrapper.(anotTag)).tag.headerName>\</b>
 			<JavaDoc.annotationsMapWrapper.(anotTag):{anot|
 				\<ul>
-					<anot.name> <if(anot.name && anot.description)>-<endif> <anot.description>
+					<anot.description>
 				\</ul>
 			}; separator="\n">
 	\</ul>

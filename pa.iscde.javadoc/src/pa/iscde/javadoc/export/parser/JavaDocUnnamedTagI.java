@@ -1,4 +1,4 @@
-package pa.iscde.javadoc.parser.export;
+package pa.iscde.javadoc.export.parser;
 
 import pa.iscde.javadoc.parser.structure.JavaDocTagI;
 

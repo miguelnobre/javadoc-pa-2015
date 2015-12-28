@@ -22,6 +22,10 @@ public class JavaDocBlock {
 	return annotations;
     }
 
+    /**
+     * Wrapper do MultiMap do Guava, pois o StringTemplate, não tem um comportamento esperado com a sua utilizacao
+     * @return
+     */
     public Map<String, ArrayList<JavaDocAnnotation>> getAnnotationsMapWrapper() {
 	Map<String, ArrayList<JavaDocAnnotation>> map = new HashMap<String, ArrayList<JavaDocAnnotation>>();
 
