@@ -1,6 +1,6 @@
 package pt.iscde.javadoc.annotations.mfane;
 
-import pa.iscde.javadoc.export.parser.JavaDocCustomTag;
+import pa.iscde.javadoc.export.parser.JavaDocCustomTagI;
 
 /**
  * Implementação da Extensão para definir uma nova Custom Tag
@@ -10,5 +10,5 @@ import pa.iscde.javadoc.export.parser.JavaDocCustomTag;
  */
 public interface JavaDocCustomAnnotationExtension {
 
-    public JavaDocCustomTag getJavaDocCustomTag();
+    public JavaDocCustomTagI getJavaDocCustomTag();
 }

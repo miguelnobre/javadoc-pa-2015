@@ -16,7 +16,7 @@ import org.osgi.service.log.LogService;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
-import pa.iscde.javadoc.export.parser.JavaDocCustomTag;
+import pa.iscde.javadoc.export.parser.JavaDocCustomTagI;
 import pa.iscde.javadoc.export.parser.JavaDocNamedTagI;
 import pa.iscde.javadoc.export.parser.JavaDocUnnamedTagI;
 import pa.iscde.javadoc.export.style.AnnotationStyleI;
@@ -114,8 +114,8 @@ public class JavaDocParser {
 
 		    } else if (anotTag instanceof JavaDocUnnamedTagI) {
 			description = text;
-		    } else if (anotTag instanceof JavaDocCustomTag) {
-			JavaDocCustomTag customTag = (JavaDocCustomTag) anotTag;
+		    } else if (anotTag instanceof JavaDocCustomTagI) {
+			JavaDocCustomTagI customTag = (JavaDocCustomTagI) anotTag;
 			String[] columns = text.split(customTag.getColumnSeparator());
 
 			// Garante que o n de colunas no JavaDoc é o que se esta a espera

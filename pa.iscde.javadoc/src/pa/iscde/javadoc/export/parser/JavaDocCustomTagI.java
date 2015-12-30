@@ -8,7 +8,7 @@ import pa.iscde.javadoc.parser.structure.JavaDocTagI;
  * @author Miguel
  *
  */
-public interface JavaDocCustomTag extends JavaDocTagI {
+public interface JavaDocCustomTagI extends JavaDocTagI {
 
     /**
      * Permite definir quantas colunas a tag vai suportar
