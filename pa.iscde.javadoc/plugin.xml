@@ -13,4 +13,13 @@
             icon="javadoc.gif">
       </view>
    </extension>
+   <extension
+         id="javadoc"
+         name="JavaDoc"
+         point="pa.iscde.deepsearch.output_preview">
+      <item
+            class="pa.iscde.javadoc.extensions.DeepSearchOutputPreview"
+            name="DeepSearchJavaDocOutputPreview">
+      </item>
+   </extension>
 </plugin>

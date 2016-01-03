@@ -28,6 +28,8 @@ import pt.iscte.pidesco.javaeditor.service.JavaEditorServices;
 
 public class JavaDocView implements PidescoView {
 
+    private static final String NAVIGATION_BAR = "<b>Menu de Navegação: </b><a href='#back'>Voltar</a> <a href='#next'>Seguinte</a> <br>";
+
     private static JavaDocView instance = null;
 
     private Composite viewArea;
@@ -38,7 +40,7 @@ public class JavaDocView implements PidescoView {
 
     private Stack<String> stackNext = new Stack<String>();
     private Stack<String> stackPrevious = new Stack<String>();
-    
+
     public static JavaDocView getInstance() {
 	return instance;
     }
@@ -66,9 +68,11 @@ public class JavaDocView implements PidescoView {
 	    public void changed(LocationEvent event) {
 		// Evento para seleccionar o codigo do metodo
 		if (event.location.contains("#") && event.location.contains("-")) {
-		    if (null != lastParsedFile && lastParsedFile.equals(JavaDocServiceLocator.getJavaEditorService().getOpenedFile())) {
+		    if (null != lastParsedFile
+			    && lastParsedFile.equals(JavaDocServiceLocator.getJavaEditorService().getOpenedFile())) {
 			String location[] = event.location.substring(event.location.indexOf("#") + 1).split("-");
-			JavaDocServiceLocator.getJavaEditorService().selectText(lastParsedFile, Integer.valueOf(location[0]), Integer.valueOf(location[1]));
+			JavaDocServiceLocator.getJavaEditorService().selectText(lastParsedFile,
+				Integer.valueOf(location[0]), Integer.valueOf(location[1]));
 		    }
 		} // Evento para Navegar no JavaDoc
 		else if (event.location.contains("#") && event.location.contains(".java")) {
@@ -93,7 +97,9 @@ public class JavaDocView implements PidescoView {
 		    try {
 			URL url = new URL(event.location);
 			Desktop.getDesktop().browse(url.toURI());
-			//Como o browser abre a pagina do link, é necessário fazer parse de novo a classe, para que o Browser volte a apresentar o JavaDoc.
+			// Como o browser abre a pagina do link, é necessário
+			// fazer parse de novo a classe, para que o Browser
+			// volte a apresentar o JavaDoc.
 			JavaDocServiceLocator.getJavaEditorService().openFile(lastParsedFile);
 		    } catch (IOException e) {
 			e.printStackTrace();
@@ -128,7 +134,7 @@ public class JavaDocView implements PidescoView {
 	} else {
 	    javaEditorListener = null;
 	}
-	
+
 	final ISearchEventListener iSearchEventListener;
 	final ISearchEvent searchService = JavaDocServiceLocator.getSearchService();
 	if (null != searchService) {
@@ -138,19 +144,19 @@ public class JavaDocView implements PidescoView {
 			String specificText_SearchInCombo, String text_SearchForCombo,
 			ArrayList<String> buttonsSelected_SearchForCombo) {
 		    if (lastGeneratedText != null) {
-			browser.setText(lastGeneratedText.replace(text_Search, "<mark>" + text_Search + "</mark>"));
+			setJavadocText(lastGeneratedText.replace(text_Search, "<mark>" + text_Search + "</mark>"));
 		    }
 		}
 	    });
 	} else {
 	    iSearchEventListener = null;
 	}
-	
+
 	viewArea.addDisposeListener(new DisposeListener() {
 	    @Override
 	    public void widgetDisposed(DisposeEvent e) {
 		instance = null;
-		if (null != javaEditorListener && null != javaEditorListener ) {
+		if (null != javaEditorListener && null != javaEditorListener) {
 		    javaEditorServices.removeListener(javaEditorListener);
 		}
 		if (null != searchService && null != iSearchEventListener) {
@@ -158,7 +164,7 @@ public class JavaDocView implements PidescoView {
 		}
 	    }
 	});
-	
+
 	File openedFile;
 	if (null != (openedFile = JavaDocServiceLocator.getJavaEditorService().getOpenedFile())) {
 	    generateJavadoc(openedFile);
@@ -176,13 +182,27 @@ public class JavaDocView implements PidescoView {
 	if (null != openedFile) {
 	    StringBuilder sb = new StringBuilder();
 	    StringTemplateVisitor jDoc = new StringTemplateVisitor(sb);
+
 	    JavaDocServiceLocator.getJavaEditorService().parseFile(openedFile, jDoc);
-	    lastGeneratedText = "<b>Menu de Navegação: </b><a href='#back'>Voltar</a> <a href='#next'>Seguinte</a> <br>" + sb.toString();
-	    this.browser.setText(lastGeneratedText);
+
 	    lastParsedFile = openedFile;
+	    setJavadocText(lastGeneratedText = sb.toString());
+
 	    if (stackPrevious.isEmpty() || !lastParsedFile.getAbsolutePath().equals(stackPrevious.peek())) {
 		stackPrevious.push(lastParsedFile.getAbsolutePath());
 	    }
 	}
+    }
+
+    private String addNavigationBar(final String javadoc) {
+	return NAVIGATION_BAR + javadoc;
+    }
+
+    private void setJavadocText(final String javadoc) {
+	this.browser.setText(addNavigationBar(javadoc));
+    }
+
+    public String getLastGeneratedText() {
+	return lastGeneratedText;
     }
 }
