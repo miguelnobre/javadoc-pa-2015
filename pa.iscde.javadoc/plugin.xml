@@ -9,7 +9,8 @@
          name="JavaDoc"
          point="pt.iscte.pidesco.view">
       <view
-            class="pa.iscde.javadoc.internal.JavaDocView">
+            class="pa.iscde.javadoc.internal.JavaDocView"
+            icon="javadoc.gif">
       </view>
    </extension>
 </plugin>
