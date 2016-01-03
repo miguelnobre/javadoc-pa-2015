@@ -9,6 +9,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
+import extensionpoints.ISearchEvent;
 import pa.iscde.javadoc.service.JavaDocServices;
 import pt.iscte.pidesco.extensibility.PidescoServices;
 import pt.iscte.pidesco.javaeditor.service.JavaEditorServices;
@@ -72,7 +73,11 @@ public class JavaDocServiceLocator {
     public static JavaDocServices getJavaDocServices() {
 	return getService(JavaDocServices.class);
     }
-
+    
+    public static ISearchEvent getSearchService() {
+	return getService(ISearchEvent.class);
+    }
+    
     public static void setService(Class<?> clazz, Object o) {
 	if (!clazz.isInterface()) {
 	    throw new IllegalArgumentException();

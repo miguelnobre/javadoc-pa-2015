@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Stack;
 
@@ -18,6 +19,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import extensionpoints.ISearchEvent;
+import extensionpoints.ISearchEventListener;
 import pa.iscde.javadoc.generator.StringTemplateVisitor;
 import pt.iscte.pidesco.extensibility.PidescoView;
 import pt.iscte.pidesco.javaeditor.service.JavaEditorListener;
@@ -31,10 +34,11 @@ public class JavaDocView implements PidescoView {
     private Browser browser;
 
     private File lastParsedFile;
+    private String lastGeneratedText;
 
-    public Stack<String> stackNext = new Stack<String>();
-    public Stack<String> stackPrevious = new Stack<String>();
-
+    private Stack<String> stackNext = new Stack<String>();
+    private Stack<String> stackPrevious = new Stack<String>();
+    
     public static JavaDocView getInstance() {
 	return instance;
     }
@@ -124,17 +128,37 @@ public class JavaDocView implements PidescoView {
 	} else {
 	    javaEditorListener = null;
 	}
-
+	
+	final ISearchEventListener iSearchEventListener;
+	final ISearchEvent searchService = JavaDocServiceLocator.getSearchService();
+	if (null != searchService) {
+	    searchService.addListener(iSearchEventListener = new ISearchEventListener() {
+		@Override
+		public void widgetSelected(String text_Search, String text_SearchInCombo,
+			String specificText_SearchInCombo, String text_SearchForCombo,
+			ArrayList<String> buttonsSelected_SearchForCombo) {
+		    if (lastGeneratedText != null) {
+			browser.setText(lastGeneratedText.replace(text_Search, "<mark>" + text_Search + "</mark>"));
+		    }
+		}
+	    });
+	} else {
+	    iSearchEventListener = null;
+	}
+	
 	viewArea.addDisposeListener(new DisposeListener() {
 	    @Override
 	    public void widgetDisposed(DisposeEvent e) {
 		instance = null;
-		if (null != javaEditorListener) {
+		if (null != javaEditorListener && null != javaEditorListener ) {
 		    javaEditorServices.removeListener(javaEditorListener);
+		}
+		if (null != searchService && null != iSearchEventListener) {
+		    searchService.removeListener(iSearchEventListener);
 		}
 	    }
 	});
-
+	
 	File openedFile;
 	if (null != (openedFile = JavaDocServiceLocator.getJavaEditorService().getOpenedFile())) {
 	    generateJavadoc(openedFile);
@@ -148,15 +172,14 @@ public class JavaDocView implements PidescoView {
 	}
     }
 
-    public void generateJavadoc(final File openedFile) {
+    private void generateJavadoc(final File openedFile) {
 	if (null != openedFile) {
 	    StringBuilder sb = new StringBuilder();
 	    StringTemplateVisitor jDoc = new StringTemplateVisitor(sb);
 	    JavaDocServiceLocator.getJavaEditorService().parseFile(openedFile, jDoc);
-	    String HTML = "<b>Menu de Navegação: </b><a href='#back'>Voltar</a> <a href='#next'>Seguinte</a> <br>" + sb.toString();
-	    this.browser.setText(HTML);
+	    lastGeneratedText = "<b>Menu de Navegação: </b><a href='#back'>Voltar</a> <a href='#next'>Seguinte</a> <br>" + sb.toString();
+	    this.browser.setText(lastGeneratedText);
 	    lastParsedFile = openedFile;
-
 	    if (stackPrevious.isEmpty() || !lastParsedFile.getAbsolutePath().equals(stackPrevious.peek())) {
 		stackPrevious.push(lastParsedFile.getAbsolutePath());
 	    }
