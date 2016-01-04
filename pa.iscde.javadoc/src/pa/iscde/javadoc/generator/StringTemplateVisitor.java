@@ -1,7 +1,7 @@
 package pa.iscde.javadoc.generator;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -20,6 +20,7 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import pa.iscde.javadoc.export.render.JavaDocFieldRender;
@@ -43,49 +44,75 @@ public class StringTemplateVisitor extends ASTVisitor {
 
     ////
 
+    private static final String EXTENSION_POINT_ID = "pa.iscde.javadoc.renderers";
+
     private static final String EXTENSION_RENDER_METHOD = "methodRender";
     private static final String EXTENSION_RENDER_FIELD = "fieldRender";
     private static final String EXTENSION_RENDER_GENERIC = "genericRender";
 
     private static final String ATTRIBUTE_CLASS = "class";
     private static final String ATTRIBUTE_NAME = "name";
+    private static final String ATTRIBUTE_RENDER_TYPE = "renderType";
+    private static final String ATTRIBUTE_RENDER_TYPE_PREVISIT = "preVisit";
+    private static final String ATTRIBUTE_RENDER_TYPE_POSTVISIT = "postVisit";
 
     private static final String SCOPE_ALL = "!!ALL!!";
 
-    private static Multimap<String, JavaDocMethodRender> methodRenderers = ArrayListMultimap.create();
-    private static Multimap<String, JavaDocFieldRender> fieldRenderers = ArrayListMultimap.create();
-    private static List<JavaDocGenericRender> genericRenderers = new ArrayList<JavaDocGenericRender>();
+    // Type -> (pre|pos) -> (name | ALL) -> renderClass;
+    private static Map<Class<? extends ASTNode>, Map<String, HashMultimap<String, Object>>> renderers = new HashMap<Class<? extends ASTNode>, Map<String, HashMultimap<String, Object>>>();
+
+    static {
+	Map<String, HashMultimap<String, Object>> m;
+
+	m = new HashMap<String, HashMultimap<String, Object>>();
+	m.put(ATTRIBUTE_RENDER_TYPE_PREVISIT, HashMultimap.<String, Object> create());
+	m.put(ATTRIBUTE_RENDER_TYPE_POSTVISIT, HashMultimap.<String, Object> create());
+	renderers.put(ASTNode.class, m);
+
+	m = new HashMap<String, HashMultimap<String, Object>>();
+	m.put(ATTRIBUTE_RENDER_TYPE_PREVISIT, HashMultimap.<String, Object> create());
+	m.put(ATTRIBUTE_RENDER_TYPE_POSTVISIT, HashMultimap.<String, Object> create());
+	renderers.put(MethodDeclaration.class, m);
+
+	m = new HashMap<String, HashMultimap<String, Object>>();
+	m.put(ATTRIBUTE_RENDER_TYPE_PREVISIT, HashMultimap.<String, Object> create());
+	m.put(ATTRIBUTE_RENDER_TYPE_POSTVISIT, HashMultimap.<String, Object> create());
+	renderers.put(FieldDeclaration.class, m);
+    }
 
     private static void addExtensionRenderers() {
-
-	IExtensionRegistry extRegistry = Platform.getExtensionRegistry();
-	IExtensionPoint extensionPoint = extRegistry.getExtensionPoint("pa.iscde.javadoc.render");
-
+	IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(EXTENSION_POINT_ID);
 	if (null != extensionPoint) {
-
 	    IExtension[] extensions = extensionPoint.getExtensions();
 	    for (IExtension e : extensions) {
 		IConfigurationElement[] confElements = e.getConfigurationElements();
 		for (IConfigurationElement c : confElements) {
 		    try {
-			final String attribute = c.getAttribute(ATTRIBUTE_NAME);
-			final JavaDocGenericRender genericRender = (JavaDocGenericRender) c
-				.createExecutableExtension(ATTRIBUTE_CLASS);
-			final String name = (attribute != null && attribute.trim().length() > 0) ? attribute.trim()
-				: SCOPE_ALL;
-			switch (c.getName()) {
+			final String name = c.getAttribute(ATTRIBUTE_NAME);
+			final String renderType = c.getAttribute(ATTRIBUTE_RENDER_TYPE);
+			
+			final String renderName = c.getChildren()[0].getName();
+			final Object render = c.getChildren()[0].createExecutableExtension(ATTRIBUTE_CLASS);
+			final String renderAttribute = c.getChildren()[0].getAttribute(ATTRIBUTE_NAME);
+
+			final String renderScope = (renderAttribute != null && renderAttribute.trim().length() > 0)
+				? renderAttribute.trim() : SCOPE_ALL;
+
+			final Class<? extends ASTNode> clazz;
+			switch (renderName) {
 			case EXTENSION_RENDER_METHOD:
-			    methodRenderers.put(name, (JavaDocMethodRender) genericRender);
+			    clazz = MethodDeclaration.class;
 			    break;
 			case EXTENSION_RENDER_FIELD:
-			    fieldRenderers.put(name, (JavaDocFieldRender) genericRender);
+			    clazz = FieldDeclaration.class;
 			    break;
 			case EXTENSION_RENDER_GENERIC:
-			    genericRenderers.add(genericRender);
+			    clazz = ASTNode.class;
 			    break;
 			default:
 			    throw new IllegalArgumentException();
 			}
+			renderers.get(clazz).get(renderType).put(renderScope, render);
 		    } catch (CoreException ex) {
 			JavaDocServiceLocator.getLogService().log(LogService.LOG_ERROR, ex.getMessage());
 		    }
