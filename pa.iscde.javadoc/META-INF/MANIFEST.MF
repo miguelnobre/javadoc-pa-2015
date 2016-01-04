@@ -21,5 +21,6 @@ Bundle-ClassPath: lib/ST-4.0.8.jar,
  .,
  lib/guava-18.0.jar
 Export-Package: pa.iscde.javadoc.export.parser,
+ pa.iscde.javadoc.export.render,
  pa.iscde.javadoc.export.style,
  pt.iscde.javadoc.annotations.mfane
