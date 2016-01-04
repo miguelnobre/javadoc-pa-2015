@@ -8,6 +8,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -186,7 +188,20 @@ public class JavaDocView implements PidescoView {
 	    JavaDocServiceLocator.getJavaEditorService().parseFile(openedFile, jDoc);
 
 	    lastParsedFile = openedFile;
-	    setJavadocText(lastGeneratedText = sb.toString());
+	    lastGeneratedText = sb.toString();
+
+	    Pattern p = Pattern.compile("^", Pattern.MULTILINE);
+	    Matcher m = p.matcher(lastGeneratedText);
+	    StringBuffer sbf = new StringBuffer();
+	    int line = 0;
+	    while (m.find()) {
+		m.appendReplacement(sbf, "<a name='L" + (line++) + "'></a>$0");
+	    }
+	    m.appendTail(sbf);
+
+	    lastGeneratedText = sbf.toString();
+
+	    setJavadocText(lastGeneratedText);
 
 	    if (stackPrevious.isEmpty() || !lastParsedFile.getAbsolutePath().equals(stackPrevious.peek())) {
 		stackPrevious.push(lastParsedFile.getAbsolutePath());
@@ -204,5 +219,9 @@ public class JavaDocView implements PidescoView {
 
     public String getLastGeneratedText() {
 	return lastGeneratedText;
+    }
+
+    public void jumpToSearchPosition(String textSearch, int line) {
+	this.browser.evaluate("window.location.hash = 'L" + line + "';", true);
     }
 }

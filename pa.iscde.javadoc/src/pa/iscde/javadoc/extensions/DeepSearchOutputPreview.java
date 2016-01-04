@@ -27,6 +27,17 @@ public class DeepSearchOutputPreview implements OutputPreview {
 
     private ArrayList<Item> foundItems = new ArrayList<>();
 
+    private static class SpecialData {
+	private int line;
+	private String textSearch;
+
+	private SpecialData(int line, String textSearch) {
+	    this.line = line;
+	    this.textSearch = textSearch;
+	}
+
+    }
+
     @Override
     public void search(String textSearch, String textSearchInCombo, String specificTextSearchInCombo,
 	    String textSearchForCombo, ArrayList<String> buttonsSelectedSearchForCombo) {
@@ -38,8 +49,8 @@ public class DeepSearchOutputPreview implements OutputPreview {
 	    for (int line = 0; line < htmlLines.length; line++) {
 		if (htmlLines[line].contains(textSearch)) {
 		    final String htmlString = formatPreviewText(htmlLines, line, NLINES_BEFORE, NLINES_AFTER);
-		    DeepSearchOutputItem item = new DeepSearchOutputItem(JAVADOC_TITLE, htmlString, textSearch.toLowerCase(),
-			    JAVADOC_IMAGE, Integer.valueOf(line));
+		    DeepSearchOutputItem item = new DeepSearchOutputItem(JAVADOC_TITLE, htmlString,
+			    textSearch.toLowerCase(), JAVADOC_IMAGE, new SpecialData(line, textSearch));
 		    foundItems.add(item);
 		}
 	    }
@@ -79,7 +90,9 @@ public class DeepSearchOutputPreview implements OutputPreview {
 
     @Override
     public void doubleClick(Item item) {
-
+	if (null != item && item.getSpecialData() instanceof SpecialData && null != JavaDocView.getInstance()) {
+	    SpecialData specialData = (SpecialData) item.getSpecialData();
+	    JavaDocView.getInstance().jumpToSearchPosition(specialData.textSearch, specialData.line);
+	}
     }
-
 }
