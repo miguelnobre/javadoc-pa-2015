@@ -4,6 +4,6 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 
 public interface JavaDocMethodRender {
 
-    boolean render(MethodDeclaration field, StringBuilder sb);
+    boolean render(MethodDeclaration method, StringBuilder sb);
 
 }
