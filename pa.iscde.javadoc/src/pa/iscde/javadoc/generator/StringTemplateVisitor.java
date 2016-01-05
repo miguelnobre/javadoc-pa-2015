@@ -7,7 +7,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -20,9 +19,7 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 
 import pa.iscde.javadoc.export.render.JavaDocFieldRender;
 import pa.iscde.javadoc.export.render.JavaDocGenericRender;
@@ -122,7 +119,7 @@ public class StringTemplateVisitor extends ASTVisitor {
 
     /////
     public StringTemplateVisitor(final StringBuilder stringBuilder) {
-	this(stringBuilder, false);
+	this(stringBuilder, true);
     }
 
     public StringTemplateVisitor(final StringBuilder stringBuilder, boolean showElementsWithoutJavaDoc) {
@@ -136,11 +133,11 @@ public class StringTemplateVisitor extends ASTVisitor {
 
 	final ST template = group.getInstanceOf(operation + "_" + node.getClass().getSimpleName());
 
-	if (null != template) {
+	if (processExtensions(node, operation, stringBuilder)) {
+	    return;
+	}
 
-	    if (processExtensions(node, operation, stringBuilder)) {
-		return;
-	    }
+	if (null != template) {
 
 	    BodyDeclaration bd = (BodyDeclaration) node;
 	    JavaDocBlock javaDoc = new JavaDocBlock();
