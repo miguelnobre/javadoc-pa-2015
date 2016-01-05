@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.osgi.service.log.LogService;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -88,16 +89,14 @@ public class StringTemplateVisitor extends ASTVisitor {
 		IConfigurationElement[] confElements = e.getConfigurationElements();
 		for (IConfigurationElement c : confElements) {
 		    try {
+			@SuppressWarnings("unused")
 			final String name = c.getAttribute(ATTRIBUTE_NAME);
 			final String renderType = c.getAttribute(ATTRIBUTE_RENDER_TYPE);
-			
 			final String renderName = c.getChildren()[0].getName();
 			final Object render = c.getChildren()[0].createExecutableExtension(ATTRIBUTE_CLASS);
 			final String renderAttribute = c.getChildren()[0].getAttribute(ATTRIBUTE_NAME);
-
 			final String renderScope = (renderAttribute != null && renderAttribute.trim().length() > 0)
 				? renderAttribute.trim() : SCOPE_ALL;
-
 			final Class<? extends ASTNode> clazz;
 			switch (renderName) {
 			case EXTENSION_RENDER_METHOD:
@@ -134,9 +133,15 @@ public class StringTemplateVisitor extends ASTVisitor {
     }
 
     private void renderNode(final ASTNode node, final String operation) {
+
 	final ST template = group.getInstanceOf(operation + "_" + node.getClass().getSimpleName());
 
 	if (null != template) {
+
+	    if (processExtensions(node, operation, stringBuilder)) {
+		return;
+	    }
+
 	    BodyDeclaration bd = (BodyDeclaration) node;
 	    JavaDocBlock javaDoc = new JavaDocBlock();
 
@@ -163,6 +168,51 @@ public class StringTemplateVisitor extends ASTVisitor {
 		stringBuilder.append(template.render());
 	    }
 	}
+    }
+
+    private boolean processExtensions(final ASTNode node, final String operation, final StringBuilder sb) {
+	Map<String, HashMultimap<String, Object>> m = renderers.get(node.getClass());
+	if (null != m) {
+	    HashMultimap<String, Object> r = m.get(operation);
+	    if (node instanceof MethodDeclaration) {
+		MethodDeclaration mDeclaration = (MethodDeclaration) node;
+		for (Object o : r.get(mDeclaration.getName().getFullyQualifiedName())) {
+		    JavaDocMethodRender jRender = (JavaDocMethodRender) o;
+		    if (jRender.render(mDeclaration, sb)) {
+			return true;
+		    }
+		}
+		for (Object o : r.get(SCOPE_ALL)) {
+		    JavaDocMethodRender jRender = (JavaDocMethodRender) o;
+		    if (jRender.render(mDeclaration, sb)) {
+			return true;
+		    }
+		}
+	    } else if (node instanceof FieldDeclaration) {
+		FieldDeclaration fDeclaration = (FieldDeclaration) node;
+		for (Object o : r.get(((VariableDeclarationFragment) fDeclaration.fragments().get(0)).getName()
+			.getFullyQualifiedName())) {
+		    JavaDocFieldRender jRender = (JavaDocFieldRender) o;
+		    if (jRender.render(fDeclaration, sb)) {
+			return true;
+		    }
+		}
+		for (Object o : r.get(SCOPE_ALL)) {
+		    JavaDocFieldRender jRender = (JavaDocFieldRender) o;
+		    if (jRender.render(fDeclaration, sb)) {
+			return true;
+		    }
+		}
+	    } else {
+		for (Object o : r.get(SCOPE_ALL)) {
+		    JavaDocGenericRender jRender = (JavaDocGenericRender) o;
+		    if (jRender.render(node, sb)) {
+			return true;
+		    }
+		}
+	    }
+	}
+	return false;
     }
 
     @Override
