@@ -197,7 +197,7 @@ public class StringTemplateVisitor extends ASTVisitor {
     private boolean processMethodExtension(JavaDocMethodRender jRender, MethodDeclaration mDeclaration,
 	    StringBuilder sb) {
 	final StringBuilder sbExtension = new StringBuilder();
-	final boolean completed = jRender.render(mDeclaration, sb);
+	final boolean completed = jRender.render(mDeclaration, sbExtension);
 	if (sbExtension.length() > 0) {
 	    sb.append(sbExtension);
 	}
@@ -206,7 +206,7 @@ public class StringTemplateVisitor extends ASTVisitor {
 
     private boolean processFieldExtension(JavaDocFieldRender jRender, FieldDeclaration fDeclaration, StringBuilder sb) {
 	final StringBuilder sbExtension = new StringBuilder();
-	final boolean completed = jRender.render(fDeclaration, sb);
+	final boolean completed = jRender.render(fDeclaration, sbExtension);
 	if (sbExtension.length() > 0) {
 	    sb.append(sbExtension);
 	}
