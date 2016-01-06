@@ -11,6 +11,7 @@ Require-Bundle: org.eclipse.osgi,
 Import-Package: org.eclipse.core.runtime;version="3.5.0",
  org.eclipse.jdt.core.dom,
  org.eclipse.jdt.internal.compiler.ast,
+ org.eclipse.jface.resource,
  org.eclipse.swt.widgets,
  pt.iscte.pidesco.extensibility,
  pt.iscte.pidesco.javaeditor.service
@@ -20,5 +21,7 @@ Bundle-ClassPath: lib/ST-4.0.8.jar,
  .,
  lib/guava-18.0.jar
 Export-Package: pa.iscde.javadoc.export.parser,
+ pa.iscde.javadoc.export.render,
  pa.iscde.javadoc.export.style,
+ pa.iscde.javadoc.service,
  pt.iscde.javadoc.annotations.mfane

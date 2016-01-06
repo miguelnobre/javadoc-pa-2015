@@ -3,13 +3,24 @@
 <plugin
 >
    <extension-point id="annotations" name="JavaDoc Annotations" schema="schema/javadocannotations.exsd"/>
+   <extension-point id="renderers" name="JavaDoc Custom Renderers" schema="schema/javadocrender.exsd"/>
    
    <extension
          id="javadoc"
          name="JavaDoc"
          point="pt.iscte.pidesco.view">
       <view
-            class="pa.iscde.javadoc.internal.JavaDocView">
+            class="pa.iscde.javadoc.internal.JavaDocView"
+            icon="javadoc.gif">
       </view>
+   </extension>
+   <extension
+         id="javadoc"
+         name="JavaDoc"
+         point="pa.iscde.deepsearch.output_preview">
+      <item
+            class="pa.iscde.javadoc.extensions.DeepSearchOutputPreview"
+            name="DeepSearchJavaDocOutputPreview">
+      </item>
    </extension>
 </plugin>

@@ -3,8 +3,14 @@ package pa.iscde.javadoc.internal;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
@@ -19,22 +25,24 @@ public class JavaDocServiceLocator {
 
     private static JavaDocServiceLocator jdServiceLocatorInstance;
 
-    private static LogService logServiceProxy = (LogService) Proxy.newProxyInstance(JavaDocServiceLocator.class.getClassLoader(), new Class[] { LogService.class }, new InvocationHandler() {
-	@Override
-	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-	    StringBuilder sb = new StringBuilder();
-	    sb.append("LogService Proxy Method:").append(method.getName()).append(" invoked with paramenters:");
-	    for (Object o : args) {
-		sb.append(o).append(";");
-	    }
-	    sb.append('\n');
-	    return null;
-	}
-    });
+    private static LogService logServiceProxy = (LogService) Proxy.newProxyInstance(
+	    JavaDocServiceLocator.class.getClassLoader(), new Class[] { LogService.class }, new InvocationHandler() {
+		@Override
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+		    StringBuilder sb = new StringBuilder();
+		    sb.append("LogService Proxy Method:").append(method.getName()).append(" invoked with paramenters:");
+		    for (Object o : args) {
+			sb.append(o).append(";");
+		    }
+		    sb.append('\n');
+		    return null;
+		}
+	    });
 
     private BundleContext context;
 
-    private HashMap<Class<?>, Object> serviceMap = new HashMap<>();
+    private HashMap<Class<?>, Object> serviceMap = new HashMap<Class<?>, Object>();
+    private Map<String, Image> imageMap = new HashMap<String, Image>();
 
     private JavaDocServiceLocator(final BundleContext ctx) {
 	this.context = ctx;
@@ -73,11 +81,11 @@ public class JavaDocServiceLocator {
     public static JavaDocServices getJavaDocServices() {
 	return getService(JavaDocServices.class);
     }
-    
+
     public static ISearchEvent getSearchService() {
 	return getService(ISearchEvent.class);
     }
-    
+
     public static void setService(Class<?> clazz, Object o) {
 	if (!clazz.isInterface()) {
 	    throw new IllegalArgumentException();
@@ -117,6 +125,25 @@ public class JavaDocServiceLocator {
 	    }
 	}
 	return service;
+    }
+
+    public static URL getFileURL(final String fullPath) {
+	if(null == jdServiceLocatorInstance) {
+	    throw new IllegalStateException();
+	}
+	return FileLocator.find(jdServiceLocatorInstance.context.getBundle(), new Path(fullPath), null);
+    }
+
+    public static Image getImage(final String fullPath) {	
+	if(null == jdServiceLocatorInstance) {
+	    throw new IllegalStateException();
+	}
+	Image img = jdServiceLocatorInstance.imageMap.get(fullPath);
+	if (null == img) {
+	    img = ImageDescriptor.createFromURL(getFileURL(fullPath)).createImage();
+	    jdServiceLocatorInstance.imageMap.put(fullPath, img);
+	}
+	return img;
     }
 
 }
