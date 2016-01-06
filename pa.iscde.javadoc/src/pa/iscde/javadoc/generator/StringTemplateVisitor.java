@@ -27,20 +27,24 @@ import pa.iscde.javadoc.export.render.JavaDocMethodRender;
 import pa.iscde.javadoc.internal.JavaDocServiceLocator;
 import pa.iscde.javadoc.parser.JavaDocParser;
 import pa.iscde.javadoc.parser.structure.JavaDocBlock;
+import pa.iscde.javadoc.service.JavaDocServices;
+import pa.iscde.javadoc.service.JavaDocServices.Type;
 
 public class StringTemplateVisitor extends ASTVisitor {
 
     private static final STGroup group;
 
     private StringBuilder stringBuilder;
+
+    private Type type;
+    private String name;
     private boolean showElementsWithoutJavaDoc;
+
     private JavaDocParser javaDocParser = new JavaDocParser();
 
     static {
 	group = new STGroupFile("/pa/iscde/javadoc/templates/javadoc.stg");
     }
-
-    ////
 
     private static final String EXTENSION_POINT_ID = "pa.iscde.javadoc.renderers";
 
@@ -117,9 +121,15 @@ public class StringTemplateVisitor extends ASTVisitor {
 	}
     }
 
-    /////
     public StringTemplateVisitor(final StringBuilder stringBuilder) {
 	this(stringBuilder, true);
+    }
+
+    public StringTemplateVisitor(final StringBuilder stringBuilder, final JavaDocServices.Type type,
+	    final String name) {
+	this(stringBuilder, true);
+	this.type = type;
+	this.name = name;
     }
 
     public StringTemplateVisitor(final StringBuilder stringBuilder, boolean showElementsWithoutJavaDoc) {
@@ -132,6 +142,24 @@ public class StringTemplateVisitor extends ASTVisitor {
     private void renderNode(final ASTNode node, final String operation) {
 
 	final ST template = group.getInstanceOf(operation + "_" + node.getClass().getSimpleName());
+
+	if (type != null && name != null) {
+	    if (type == Type.METHOD) {
+		MethodDeclaration mDeclaration = (MethodDeclaration) node;
+		if (!mDeclaration.getName().getFullyQualifiedName().equals(name)) {
+		    return;
+		}
+	    } else if (type == Type.FIELD) {
+		FieldDeclaration fDeclaration = (FieldDeclaration) node;
+		if (!((VariableDeclarationFragment) fDeclaration.fragments().get(0)).getName().getFullyQualifiedName()
+			.equals(name)) {
+		    return;
+		}
+
+	    } else {
+		throw new IllegalStateException();
+	    }
+	}
 
 	if (processExtensions(node, operation, stringBuilder)) {
 	    return;

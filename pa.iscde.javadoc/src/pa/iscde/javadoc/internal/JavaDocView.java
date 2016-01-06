@@ -182,24 +182,20 @@ public class JavaDocView implements PidescoView {
 
     private void generateJavadoc(final File openedFile) {
 	if (null != openedFile) {
-	    StringBuilder sb = new StringBuilder();
-	    StringTemplateVisitor jDoc = new StringTemplateVisitor(sb);
-
-	    JavaDocServiceLocator.getJavaEditorService().parseFile(openedFile, jDoc);
 
 	    lastParsedFile = openedFile;
-	    lastGeneratedText = sb.toString();
+	    lastGeneratedText = JavaDocActivator.getJavaDocService().render(openedFile);
 
 	    Pattern p = Pattern.compile("^", Pattern.MULTILINE);
 	    Matcher m = p.matcher(lastGeneratedText);
-	    StringBuffer sbf = new StringBuffer();
+	    StringBuffer sb = new StringBuffer();
 	    int line = 0;
 	    while (m.find()) {
-		m.appendReplacement(sbf, "<a name='L" + (line++) + "'></a>$0");
+		m.appendReplacement(sb, "<a name='L" + (line++) + "'></a>$0");
 	    }
-	    m.appendTail(sbf);
+	    m.appendTail(sb);
 
-	    lastGeneratedText = sbf.toString();
+	    lastGeneratedText = sb.toString();
 
 	    setJavadocText(lastGeneratedText);
 

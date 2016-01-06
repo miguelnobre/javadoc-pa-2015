@@ -23,4 +23,5 @@ Bundle-ClassPath: lib/ST-4.0.8.jar,
 Export-Package: pa.iscde.javadoc.export.parser,
  pa.iscde.javadoc.export.render,
  pa.iscde.javadoc.export.style,
+ pa.iscde.javadoc.service,
  pt.iscde.javadoc.annotations.mfane
