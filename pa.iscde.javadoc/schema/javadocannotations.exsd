@@ -105,6 +105,64 @@ This extension allows you to creaate a new JavaDoc tags, so that they can be ext
       </documentation>
    </annotation>
 
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         Example of extension implementation:
+
+public class FinalTag implements JavaDocCustomAnnotationExtension {
+
+    @Override
+    public JavaDocCustomTag getJavaDocCustomTag() {
+    return new JavaDocCustomTag() {
+
+        @Override
+        public String getTagName() {
+        return &quot;final&quot;;
+        }
+
+        @Override
+        public String getHeaderName() {
+        return &quot;Final&quot;;
+        }
+
+        @Override
+        public int nColumns() {
+        return 5;
+        }
+
+        @Override
+        public String getColumnSeparator() {
+        return &quot;,&quot;;
+        }
+
+        @Override
+        public AnnotationStyleI[] getAnnotationStyle() {
+        return new AnnotationStyleI[] {
+            //Link formado pelo URL na coluna 0, o alias na coluna 4
+            //O false, indica que não vai ser omitido o URL na geração do JavaDoc
+            StyleToolBox.LinkStyle(0, 4, false),
+            //Indica que na coluna 0, o conteudo vai estar a verde
+            StyleToolBox.ColorGreenStyle(new int[] { 0 } ),
+            //Indica que na coluna 1, o conteudo vai estar a Bold
+            StyleToolBox.BoldStyle(new int[] { 1 } ),
+            //Indica que na coluna 1, o conteudo vai estar a vermelho
+            StyleToolBox.ColorRedStyle(new int[] { 1 } ),
+            //Indica que na coluna 1, o conteudo vai estar a Italico
+            StyleToolBox.ItalicStyle(new int[] { 1 } ),
+            //Indica que na coluna 3, o conteudo vai estar a azul, italico e negrito
+            StyleToolBox.BoldStyle(3),
+            StyleToolBox.ItalicStyle(3),
+            StyleToolBox.ColorStyle(Color.CYAN, 3)
+        };
+        }
+    };
+    }
+}
+      </documentation>
+   </annotation>
 
    <annotation>
       <appinfo>
@@ -112,9 +170,11 @@ This extension allows you to creaate a new JavaDoc tags, so that they can be ext
       </appinfo>
       <documentation>
          &lt;br&gt;
-public List&lt; JavaDocNamedTagI &gt; getNamedTags(): Implement this method to return the new tags with the structure: @tag name descricao
+public JavaDocNamedTagI getTag(): Implement this method to return the new tags with the structure: @tag name description
 &lt;br&gt;
-public List&lt; JavaDocUnnamedTagI &gt; getUnnamedTags(): Implement this method to return the new tags with the structure:: @tag descricao
+public JavaDocUnnamedTagI getTag(): Implement this method to return the new tags with the structure: @tag description
+&lt;br&gt;
+public JavaDocCustomTag getJavaDocCustomTag(): Implement this method to return the new custom tag.
       </documentation>
    </annotation>
 
