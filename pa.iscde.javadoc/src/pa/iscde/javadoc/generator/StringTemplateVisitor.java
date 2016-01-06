@@ -144,20 +144,19 @@ public class StringTemplateVisitor extends ASTVisitor {
 	final ST template = group.getInstanceOf(operation + "_" + node.getClass().getSimpleName());
 
 	if (type != null && name != null) {
-	    if (type == Type.METHOD) {
+	    if (type == Type.METHOD && node instanceof MethodDeclaration) {
 		MethodDeclaration mDeclaration = (MethodDeclaration) node;
 		if (!mDeclaration.getName().getFullyQualifiedName().equals(name)) {
 		    return;
 		}
-	    } else if (type == Type.FIELD) {
+	    } else if (type == Type.FIELD && node instanceof FieldDeclaration) {
 		FieldDeclaration fDeclaration = (FieldDeclaration) node;
 		if (!((VariableDeclarationFragment) fDeclaration.fragments().get(0)).getName().getFullyQualifiedName()
 			.equals(name)) {
 		    return;
 		}
-
 	    } else {
-		throw new IllegalStateException();
+		return;
 	    }
 	}
 

@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import extensionpoints.ISearchEvent;
 import extensionpoints.ISearchEventListener;
-import pa.iscde.javadoc.generator.StringTemplateVisitor;
+import pa.iscde.javadoc.service.JavaDocServices.Type;
 import pt.iscte.pidesco.extensibility.PidescoView;
 import pt.iscte.pidesco.javaeditor.service.JavaEditorListener;
 import pt.iscte.pidesco.javaeditor.service.JavaEditorServices;

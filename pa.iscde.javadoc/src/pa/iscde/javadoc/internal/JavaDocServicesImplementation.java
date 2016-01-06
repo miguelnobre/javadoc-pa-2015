@@ -26,7 +26,7 @@ public class JavaDocServicesImplementation implements JavaDocServices {
 	String generatedText = null;
 	if (null != openedFile) {
 	    StringBuilder sb = new StringBuilder();
-	    StringTemplateVisitor jDoc = new StringTemplateVisitor(sb);
+	    StringTemplateVisitor jDoc = new StringTemplateVisitor(sb, type, name);
 	    JavaDocServiceLocator.getJavaEditorService().parseFile(openedFile, jDoc);
 	    generatedText = sb.toString();
 	}
