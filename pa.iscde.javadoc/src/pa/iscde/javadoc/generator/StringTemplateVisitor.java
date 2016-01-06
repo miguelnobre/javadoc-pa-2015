@@ -19,7 +19,7 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.LinkedHashMultimap;
 
 import pa.iscde.javadoc.export.render.JavaDocFieldRender;
 import pa.iscde.javadoc.export.render.JavaDocGenericRender;
@@ -61,24 +61,24 @@ public class StringTemplateVisitor extends ASTVisitor {
     private static final String SCOPE_ALL = "!!ALL!!";
 
     // Type -> (pre|pos) -> (name | ALL) -> renderClass;
-    private static Map<Class<? extends ASTNode>, Map<String, HashMultimap<String, Object>>> renderers = new HashMap<Class<? extends ASTNode>, Map<String, HashMultimap<String, Object>>>();
+    private static Map<Class<? extends ASTNode>, Map<String, LinkedHashMultimap<String, Object>>> renderers = new HashMap<Class<? extends ASTNode>, Map<String, LinkedHashMultimap<String, Object>>>();
 
     static {
-	Map<String, HashMultimap<String, Object>> m;
+	Map<String, LinkedHashMultimap<String, Object>> m;
 
-	m = new HashMap<String, HashMultimap<String, Object>>();
-	m.put(ATTRIBUTE_RENDER_TYPE_PREVISIT, HashMultimap.<String, Object> create());
-	m.put(ATTRIBUTE_RENDER_TYPE_POSTVISIT, HashMultimap.<String, Object> create());
+	m = new HashMap<String, LinkedHashMultimap<String, Object>>();
+	m.put(ATTRIBUTE_RENDER_TYPE_PREVISIT, LinkedHashMultimap.<String, Object> create());
+	m.put(ATTRIBUTE_RENDER_TYPE_POSTVISIT, LinkedHashMultimap.<String, Object> create());
 	renderers.put(ASTNode.class, m);
 
-	m = new HashMap<String, HashMultimap<String, Object>>();
-	m.put(ATTRIBUTE_RENDER_TYPE_PREVISIT, HashMultimap.<String, Object> create());
-	m.put(ATTRIBUTE_RENDER_TYPE_POSTVISIT, HashMultimap.<String, Object> create());
+	m = new HashMap<String, LinkedHashMultimap<String, Object>>();
+	m.put(ATTRIBUTE_RENDER_TYPE_PREVISIT, LinkedHashMultimap.<String, Object> create());
+	m.put(ATTRIBUTE_RENDER_TYPE_POSTVISIT, LinkedHashMultimap.<String, Object> create());
 	renderers.put(MethodDeclaration.class, m);
 
-	m = new HashMap<String, HashMultimap<String, Object>>();
-	m.put(ATTRIBUTE_RENDER_TYPE_PREVISIT, HashMultimap.<String, Object> create());
-	m.put(ATTRIBUTE_RENDER_TYPE_POSTVISIT, HashMultimap.<String, Object> create());
+	m = new HashMap<String, LinkedHashMultimap<String, Object>>();
+	m.put(ATTRIBUTE_RENDER_TYPE_PREVISIT, LinkedHashMultimap.<String, Object> create());
+	m.put(ATTRIBUTE_RENDER_TYPE_POSTVISIT, LinkedHashMultimap.<String, Object> create());
 	renderers.put(FieldDeclaration.class, m);
     }
 
@@ -194,43 +194,64 @@ public class StringTemplateVisitor extends ASTVisitor {
 	}
     }
 
+    private boolean processMethodExtension(JavaDocMethodRender jRender, MethodDeclaration mDeclaration,
+	    StringBuilder sb) {
+	final StringBuilder sbExtension = new StringBuilder();
+	final boolean completed = jRender.render(mDeclaration, sb);
+	if (sbExtension.length() > 0) {
+	    sb.append(sbExtension);
+	}
+	return completed;
+    }
+
+    private boolean processFieldExtension(JavaDocFieldRender jRender, FieldDeclaration fDeclaration, StringBuilder sb) {
+	final StringBuilder sbExtension = new StringBuilder();
+	final boolean completed = jRender.render(fDeclaration, sb);
+	if (sbExtension.length() > 0) {
+	    sb.append(sbExtension);
+	}
+	return completed;
+    }
+
     private boolean processExtensions(final ASTNode node, final String operation, final StringBuilder sb) {
-	Map<String, HashMultimap<String, Object>> m = renderers.get(node.getClass());
+	Map<String, LinkedHashMultimap<String, Object>> m = renderers.get(node.getClass());
 	if (null != m) {
-	    HashMultimap<String, Object> r = m.get(operation);
-	    if (node instanceof MethodDeclaration) {
+	    LinkedHashMultimap<String, Object> r = m.get(operation);
+	    if (node instanceof MethodDeclaration) {	
 		MethodDeclaration mDeclaration = (MethodDeclaration) node;
 		for (Object o : r.get(mDeclaration.getName().getFullyQualifiedName())) {
-		    JavaDocMethodRender jRender = (JavaDocMethodRender) o;
-		    if (jRender.render(mDeclaration, sb)) {
+		    if (processMethodExtension((JavaDocMethodRender) o, mDeclaration, sb)) {
 			return true;
 		    }
 		}
 		for (Object o : r.get(SCOPE_ALL)) {
-		    JavaDocMethodRender jRender = (JavaDocMethodRender) o;
-		    if (jRender.render(mDeclaration, sb)) {
+		    if (processMethodExtension((JavaDocMethodRender) o, mDeclaration, sb)) {
 			return true;
 		    }
 		}
-	    } else if (node instanceof FieldDeclaration) {
+		
+	    } else if (node instanceof FieldDeclaration) {		
 		FieldDeclaration fDeclaration = (FieldDeclaration) node;
 		for (Object o : r.get(((VariableDeclarationFragment) fDeclaration.fragments().get(0)).getName()
 			.getFullyQualifiedName())) {
-		    JavaDocFieldRender jRender = (JavaDocFieldRender) o;
-		    if (jRender.render(fDeclaration, sb)) {
+		    if (processFieldExtension((JavaDocFieldRender) o, fDeclaration, sb)) {
 			return true;
 		    }
 		}
 		for (Object o : r.get(SCOPE_ALL)) {
-		    JavaDocFieldRender jRender = (JavaDocFieldRender) o;
-		    if (jRender.render(fDeclaration, sb)) {
+		    if (processFieldExtension((JavaDocFieldRender) o, fDeclaration, sb)) {
 			return true;
 		    }
-		}
-	    } else {
+		}		
+	    } else {		
 		for (Object o : r.get(SCOPE_ALL)) {
 		    JavaDocGenericRender jRender = (JavaDocGenericRender) o;
-		    if (jRender.render(node, sb)) {
+		    final StringBuilder sbExtension = new StringBuilder();
+		    final boolean completed = jRender.render(node, sbExtension);
+		    if (sbExtension.length() > 0) {
+			sb.append(sbExtension);
+		    }
+		    if (completed) {
 			return true;
 		    }
 		}
