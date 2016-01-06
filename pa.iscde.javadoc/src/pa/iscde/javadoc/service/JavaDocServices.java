@@ -5,7 +5,6 @@ import java.io.File;
 public interface JavaDocServices {
     
     enum Type {
-	FILE,
 	METHOD,
 	FIELD
     };
