@@ -8,8 +8,6 @@ import java.io.File;
  * plugins to request on-demand the generation the Javadoc for a specified file
  * or for a specific method or field contained in specified file.
  * 
- * @author jpmartins
- *
  */
 public interface JavaDocServices {
 
@@ -47,8 +45,9 @@ public interface JavaDocServices {
      * 
      * @param file
      *            name of the file for which javadoc the will be generated
-     * @param {@link
-     * 	   Type} of the element specified by the field <code>name</code>
+     * @param type
+     *            {@link Type} of the element specified by the field
+     *            <code>name</code>
      * @param name
      *            of the field or method for which should the javadoc be
      *            generated
