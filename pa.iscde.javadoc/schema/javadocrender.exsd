@@ -7,8 +7,14 @@
       </appinfo>
       <documentation>
          &lt;br&gt;
-        This extension allows you to implement a custom render for specific language tokens.
-        &lt;br&gt;
+This extension allows to implement custom render for specific language tokens.
+&lt;br/&gt;
+&lt;br/&gt;
+Inspired in the aspect idiom, it allows to intercept the javadoc generation process for fields,methods or any other parsed elements containing in the class, by plugin configuration this interceptor can be configured to run before or after the standard generation process (or before or after other interceptors). For the field and method interceptors, the application scope can also be restricted making the interceptor to be applied only to the fields with a specified name.
+&lt;br/&gt;
+&lt;br/&gt;
+The return value of the extension method is used to control is the rest of the rendering chain ought to be executed (or the process should be stopped for this element).
+&lt;br&gt;
       </documentation>
    </annotation>
 
@@ -17,6 +23,11 @@
          <appinfo>
             <meta.element />
          </appinfo>
+         <documentation>
+            Extension placeholder definion.
+
+Mainly beside the general attributes (id, name, point), the extension implementation is a composition of one or more rederers.
+         </documentation>
       </annotation>
       <complexType>
          <sequence minOccurs="1" maxOccurs="unbounded">
@@ -50,6 +61,13 @@
    </element>
 
    <element name="render">
+      <annotation>
+         <documentation>
+            Placeholder for a render.
+
+A render is defined by a name (just for referente), a type, which defines if the render is executed before of after the standard rendering process and the class (and restriction if applicable) which supports the render implementation.
+         </documentation>
+      </annotation>
       <complexType>
          <choice>
             <element ref="fieldRender"/>
@@ -59,7 +77,9 @@
          <attribute name="renderType" use="default" value="preVisit">
             <annotation>
                <documentation>
-                  
+                  Render Type
+
+Specifies if the render is executed before of after the  standard rendering process.
                </documentation>
             </annotation>
             <simpleType>
@@ -74,7 +94,7 @@
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  Given name of the render, just for implementator reference.
                </documentation>
             </annotation>
          </attribute>
@@ -82,6 +102,11 @@
    </element>
 
    <element name="methodRender">
+      <annotation>
+         <documentation>
+            Render that allows to customize the rendering process for methods.
+         </documentation>
+      </annotation>
       <complexType>
          <attribute name="class" type="string" use="required">
             <annotation>
@@ -104,6 +129,11 @@
    </element>
 
    <element name="fieldRender">
+      <annotation>
+         <documentation>
+            Render that allows to customize the rendering process for fields.
+         </documentation>
+      </annotation>
       <complexType>
          <attribute name="class" type="string" use="required">
             <annotation>
@@ -126,6 +156,11 @@
    </element>
 
    <element name="genericRender">
+      <annotation>
+         <documentation>
+            Render that allows to customize the rendering process parser tree nodes.
+         </documentation>
+      </annotation>
       <complexType>
          <attribute name="class" type="string" use="required">
             <annotation>
@@ -145,20 +180,69 @@
          <meta.section type="since"/>
       </appinfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         0.0.1
       </documentation>
    </annotation>
-
-
 
    <annotation>
       <appinfo>
-         <meta.section type="implementation"/>
+         <meta.section type="examples"/>
       </appinfo>
       <documentation>
-         [Enter information about supplied implementation of this extension point.]
+         Follows one example of a renderer that will be invoked after the rendering process of the method &lt;b&gt;toString&lt;/b&gt;
+
+&lt;h4&gt;Extension Configuration&lt;/h4&gt;
+&lt;br/&gt;
+&amp;nbsp;&amp;nbsp;&amp;lt;extension&amp;nbsp;id=&quot;pt.iscde.javadoc.renderers&quot;&amp;nbsp;&lt;br/&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;name=&quot;JavaDoc&amp;nbsp;Renderers&amp;nbsp;Extension&quot;&lt;br/&gt;&amp;nbsp;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;point=&quot;pa.iscde.javadoc.renderers&quot;&amp;gt;&lt;br/&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;lt;render&amp;nbsp;name=&quot;JavaDocNamedMethodRenderPostVisit&quot;renderType=&quot;postVisit&quot;&amp;gt;&lt;br/&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;lt;methodRender&amp;nbsp;&lt;br/&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;class=&quot;pa.iscde.testextension.JavaDocToStringMethodPostRender&quot;&amp;nbsp;&lt;br/&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;name=&quot;toString&quot;/&amp;gt;&lt;br/&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;lt;/render&amp;gt;&lt;br/&gt;
+&amp;nbsp;&amp;nbsp;&amp;lt;/extension&amp;gt;&lt;br/&gt;
+&lt;br/&gt;
+
+&lt;h4&gt;Implementation Class&lt;/h4&gt;	
+&lt;/br&gt;
+package&amp;nbsp;pa.iscde.testextension;&lt;/br&gt;
+&lt;/br&gt;
+import&amp;nbsp;org.eclipse.jdt.core.dom.MethodDeclaration;&lt;/br&gt;
+import&amp;nbsp;pa.iscde.javadoc.export.render.JavaDocMethodRender;&lt;/br&gt;
+&lt;/br&gt;
+public&amp;nbsp;class&amp;nbsp;JavaDocToStringMethodPostRender&amp;nbsp;implements&amp;nbsp;JavaDocMethodRender&amp;nbsp;{&lt;/br&gt;
+&lt;/br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;@Override&lt;/br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;public&amp;nbsp;boolean&amp;nbsp;render(MethodDeclaration&amp;nbsp;method,&amp;nbsp;StringBuilder&amp;nbsp;sb)&amp;nbsp;{&lt;/br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;sb.append(&quot;&amp;lt;hr&amp;gt;&quot;).append(&apos;\n&apos;);&lt;/br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;sb.append(&quot;&amp;lt;span&amp;nbsp;style=&apos;font-weight:&amp;nbsp;bold&amp;nbsp;;color:red&amp;nbsp;&apos;&amp;gt; &quot;);&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;sb..append(&quot;Method&amp;nbsp;should&amp;nbsp;be&amp;nbsp;compliant&amp;nbsp;with&amp;nbsp;standard&amp;nbsp;definition&amp;nbsp;published&amp;nbsp;in&amp;nbsp;the&amp;nbsp;coding&amp;nbsp;convetion&amp;nbsp;document.&quot;).append(“&amp;lt;/span&amp;gt;”).append(&apos;\n&apos;);&lt;/br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;sb.append(&quot;&amp;lt;hr&amp;gt;&quot;).append(&apos;\n&apos;);&lt;/br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;return&amp;nbsp;false;&lt;/br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;}&lt;/br&gt;
+&lt;/br&gt;
+}&lt;/br&gt;
+&lt;/br&gt;
       </documentation>
    </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         This extension can be used by the implementation of one (at least) of the following Interfaces, defined in the package &lt;b&gt;pa.iscde.javadoc.export.render&lt;/b&gt;:
+&lt;ul&gt;
+ &lt;li&gt;JavaDocFieldRender - Used to implement interceptors around the field definitions&lt;/li&gt;
+ &lt;li&gt;JavaDocMethodRender - Used to implement interceptors around the method definitions&lt;/li&gt;
+ &lt;li&gt;JavaDocGenericRender - Used to implement interceptors around any parse node.&lt;/li&gt;
+&lt;/ul&gt;
+
+ 
+
+      </documentation>
+   </annotation>
+
 
 
 </schema>
